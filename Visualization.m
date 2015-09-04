@@ -10,7 +10,7 @@ function Visualization(dataDir,filename)
     %fid= fopen(tracksFile);
     
     %==========================================================%
-    %  Extracting Frames and Object Position from Tracks File  %                                         
+    %                Displaying Box on Video                   %                                         
     %==========================================================%
     
 
@@ -33,25 +33,12 @@ function Visualization(dataDir,filename)
         
         position = [w x y z];  
         
-        %Draw Out 
+        %Draw it Out in video frames
         videoOut = insertObjectAnnotation(videoFrame,'rectangle',position,'Object');
         
         step(videoPlayer,videoOut);
         iterator = iterator + 1;
        
     end
-    
-    % Release resources
-     figure, imshow(videoOut);
-release(videoFileReader);
-release(videoPlayer);
-   
-    %===========================================================%
-    %                  Displaying Box on Video                  %
-    %===========================================================%
-%     videoFileReader = vision.VideoFileReader(video);
-%     videoFrame= step(videoFileReader);
-%     
-%     videoOut = insertObjectAnnotation(videoFrame,'rectangle',rectangle,'Object');
-%     figure, imshow(videoOut), title('LoViS');
+
 end
