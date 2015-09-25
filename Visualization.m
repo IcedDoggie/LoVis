@@ -41,20 +41,23 @@ function Visualization(dataDir,filename)
             % Extract Position of Bounding Box
             %VARIABLE: flag -> return the total number of records inside
             %                  boundObjects.
+            %VARIABLE: multipleObjectFlag -> helps to draw multiple
+            %                                bounding box appearing in same frame.
+            %VARIABLE: rowInBoundObjects -> return the rows in boundObjects
+            %                               matrix
             flag = size(boundObjects,1);
             positionOfBox = [0 0 0 0];
             
            
-    
             if(size(boundObjects)>0)  
                 
-                for n = 1:flag  
+                for rowInBoundObjects = 1:flag  
                     
-                    trackID = boundObjects(n,1);      
-                    x = boundObjects(n,3);      
-                    y = boundObjects(n,4);
-                    width = boundObjects(n,5);
-                    height = boundObjects(n,6);
+                    trackID = boundObjects(rowInBoundObjects,1);      
+                    x = boundObjects(rowInBoundObjects,3);      
+                    y = boundObjects(rowInBoundObjects,4);
+                    width = boundObjects(rowInBoundObjects,5);
+                    height = boundObjects(rowInBoundObjects,6);
                     positionOfBox = [x y width height];       
 
                 end
