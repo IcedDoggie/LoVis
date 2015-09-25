@@ -35,13 +35,17 @@ function Visualization(dataDir,filename)
         
             %Find the object in the specific Frame
             %VARIABLE: boundObjects -> determine the existence of object in a
-            %specifc frame. Output is a matrix. of detected Frames.
+            %          specifc frame. Output is a matrix. of detected Frames.
             boundObjects = tracksList(tracksList(:,2)==iterator,:);
 
             % Extract Position of Bounding Box
-           flag = size(boundObjects,1);
-           positionOfBox = [0 0 0 0];
-    %        while(flag > 0)
+            %VARIABLE: flag -> return the total number of records inside
+            %                  boundObjects.
+            flag = size(boundObjects,1);
+            positionOfBox = [0 0 0 0];
+            
+           
+    
             if(size(boundObjects)>0)  
                 
                 for n = 1:flag  
@@ -51,15 +55,14 @@ function Visualization(dataDir,filename)
                     y = boundObjects(n,4);
                     width = boundObjects(n,5);
                     height = boundObjects(n,6);
-                    positionOfBox = [x y width height]       
+                    positionOfBox = [x y width height];       
 
-                    
                 end
-    %             flag = flag - 1;
+                
             end
-              videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');      
-                    step(videoPlayer,videoOut);  
-    %        end
+            videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');      
+            step(videoPlayer,videoOut);  
+    
 
     % Determine what kind of object it is
     %         objectType = dataFile(2:end,2);
