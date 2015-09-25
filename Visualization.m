@@ -24,10 +24,10 @@ function Visualization(dataDir,filename)
     %disp(b);
     
     videoInfo = info(videoFileReader);
-    videoPlayer = vision.VideoPlayer('Position',[200 200 videoInfo.VideoSize+30]);
+    videoPlayer = vision.VideoPlayer('Position',[300 300 videoInfo.VideoSize+30]);
     %VARIABLE: iterator-> a helper variable in counting video frames
     iterator = 1;
-  
+    
     while ~isDone(videoFileReader)
         % Extract next frame
         videoFrame = step(videoFileReader);
@@ -37,16 +37,23 @@ function Visualization(dataDir,filename)
         %specifc frame. Output is a matrix. of detected Frames.
         boundObjects = tracksList(tracksList(:,2)==iterator,:);
             
-
+        sizeA = size(boundObjects);
         % Extract Position of Bounding Box
+        if(size(boundObjects)>0)
+            trackID = tracksList(iterator,1);      
+            x = tracksList(iterator,3);      
+            y = tracksList(iterator,4);
+            width = tracksList(iterator,5);
+            height = tracksList(iterator,6);
+            positionOfBox = [x y width height]; 
+
+        else
+            positionOfBox = [0 0 0 0];
+        end
         
-        trackID = a(iterator,1);      
-        xPos = a(iterator,3);      
-        yPos = a(iterator,4);
-        width = a(iterator,5);
-        height = a(iterator,6);
+        videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');
+        step(videoPlayer,videoOut);
         
-        position = [x y w h];  
         
         % Determine what kind of object it is
         
@@ -59,12 +66,13 @@ function Visualization(dataDir,filename)
 %         end
 
         % Draw it Out in video frames
-        videoOut = insertObjectAnnotation(videoFrame,'rectangle',position,'object');
+        
+       
     
         % Print frame number
-        videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
+%         videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
         
-        step(videoPlayer,videoOut);
+        
         iterator = iterator + 1;
         pause(0.25);
     end
