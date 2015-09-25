@@ -31,48 +31,51 @@ function Visualization(dataDir,filename)
     while ~isDone(videoFileReader)
         % Extract next frame
         videoFrame = step(videoFileReader);
+ 
         
-        %Find the object in the specific Frame
-        %VARIABLE: boundObjects -> determine the existence of object in a
-        %specifc frame. Output is a matrix. of detected Frames.
-        boundObjects = tracksList(tracksList(:,2)==iterator,:);
-            
-        sizeA = size(boundObjects);
-        % Extract Position of Bounding Box
-        if(size(boundObjects)>0)
-            trackID = tracksList(iterator,1);      
-            x = tracksList(iterator,3);      
-            y = tracksList(iterator,4);
-            width = tracksList(iterator,5);
-            height = tracksList(iterator,6);
-            positionOfBox = [x y width height]; 
+            %Find the object in the specific Frame
+            %VARIABLE: boundObjects -> determine the existence of object in a
+            %specifc frame. Output is a matrix. of detected Frames.
+            boundObjects = tracksList(tracksList(:,2)==iterator,:);
 
-        else
-            positionOfBox = [0 0 0 0];
-        end
-        
-        videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');
-        step(videoPlayer,videoOut);
-        
-        
-        % Determine what kind of object it is
-        
-%         objectType = dataFile(2:end,2);
-%         objectID = dataFile(2:end,1);
-%         if(s==objectID)
-%              objectDisplayed = dataFile(objectID,objectType);
-%         else
-%             objectDisplayed = '-';
-%         end
+            % Extract Position of Bounding Box
+           flag = size(boundObjects,1);
+           positionOfBox = [0 0 0 0];
+    %        while(flag > 0)
+            if(size(boundObjects)>0)  
+                
+                for n = 1:flag  
+                    
+                    trackID = boundObjects(n,1);      
+                    x = boundObjects(n,3);      
+                    y = boundObjects(n,4);
+                    width = boundObjects(n,5);
+                    height = boundObjects(n,6);
+                    positionOfBox = [x y width height]       
 
-        % Draw it Out in video frames
-        
-       
-    
-        % Print frame number
-%         videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
-        
-        
+                    
+                end
+    %             flag = flag - 1;
+            end
+              videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');      
+                    step(videoPlayer,videoOut);  
+    %        end
+
+    % Determine what kind of object it is
+    %         objectType = dataFile(2:end,2);
+    %         objectID = dataFile(2:end,1);
+    %         if(s==objectID)
+    %              objectDisplayed = dataFile(objectID,objectType);
+    %         else
+    %             objectDisplayed = '-';
+    %         end
+    % Draw it Out in video frames
+
+
+
+    % Print frame number
+    %         videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
+
         iterator = iterator + 1;
         pause(0.25);
     end
