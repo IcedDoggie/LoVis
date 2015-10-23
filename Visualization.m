@@ -26,7 +26,8 @@ function Visualization(dataDir,filename)
     videoPlayer = vision.VideoPlayer('Position',[400 0 videoInfo.VideoSize+30]);
     %VARIABLE: iterator-> a helper variable in counting video frames
     iterator = 1;
-    counter = 1;
+
+    
     while ~isDone(videoFileReader)
         
         
@@ -52,6 +53,7 @@ function Visualization(dataDir,filename)
             %VARIABLE: rowInBoundObjects -> return the rows in boundObjects
             %                               matrix
             flag = size(boundObjects,1);
+            
             positionOfBox = [0 0 0 0];  
             
             % Determining Objects  
@@ -62,32 +64,46 @@ function Visualization(dataDir,filename)
             
             objectType = objectType{1};
             
+            flagLabel = size(objectID,1);
+            
+            % Multiple Object Bounding
+            sizeOfArray = 100;
+            arrayOfPosition = zeros(sizeOfArray,4);
             
      
             for rowInBoundObjects = 1:flag  
+                
                 trackID = boundObjects(rowInBoundObjects,1);      
                 x = boundObjects(rowInBoundObjects,3);      
                 y = boundObjects(rowInBoundObjects,4);
                 width = boundObjects(rowInBoundObjects,5);
                 height = boundObjects(rowInBoundObjects,6);
+                 
                 positionOfBox = [x y width height];
                 
-                currentObjectID = objectID(counter,1);
-              
-                if(trackID == currentObjectID)
-                    counter = counter + 1;
-                    currentObject = objectType(trackID);
+                arrayOfPosition(rowInBoundObjects,:) = positionOfBox(1,:);
                    
+            
+                    
+
+               
+                for currentObjectID = 1:flagLabel
+                    
+                    if(trackID == currentObjectID)
+
+                        currentObject = objectType(currentObjectID);
+
+                    end
                 end
                 
-                videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,currentObject);
+                videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                
                 step(videoPlayer,videoOut); 
                
             end
             
             if(flag==0)
-                videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');
+                videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,'object');
                  step(videoPlayer,videoOut); 
             end
                 
@@ -101,7 +117,8 @@ function Visualization(dataDir,filename)
     %         videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
 
         iterator = iterator + 1;
-        pause(0.25);
+        pause(0.05);
+        clear arrayOfPosition;
     end
 
 end
