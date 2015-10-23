@@ -64,11 +64,11 @@ function Visualization(dataDir,filename)
             
             objectType = objectType{1};
             
-            flagLabel = size(objectID,1);
+            flagLabel = size(objectID,1);   % to calculate array's size of objectid
             
             % Multiple Object Bounding
-            sizeOfArray = 100;
-            arrayOfPosition = zeros(sizeOfArray,4);
+            sizeOfArray = 100;      % an upper limit for the array size.
+            arrayOfPosition = zeros(sizeOfArray,4); %initialize 100 empty arrays
             
      
             for rowInBoundObjects = 1:flag  
@@ -81,12 +81,9 @@ function Visualization(dataDir,filename)
                  
                 positionOfBox = [x y width height];
                 
-                arrayOfPosition(rowInBoundObjects,:) = positionOfBox(1,:);
-                   
-            
-                    
-
-               
+                arrayOfPosition(rowInBoundObjects,:) = positionOfBox(1,:);      % Putting the position into the empty array
+                                
+                % Determining the object Type
                 for currentObjectID = 1:flagLabel
                     
                     if(trackID == currentObjectID)
@@ -102,23 +99,18 @@ function Visualization(dataDir,filename)
                
             end
             
+            % If no frames detected
             if(flag==0)
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,'object');
-                 step(videoPlayer,videoOut); 
+                step(videoPlayer,videoOut); 
             end
                 
-
-
-
-
-
-
     % Print frame number
     %         videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
 
         iterator = iterator + 1;
         pause(0.05);
-        clear arrayOfPosition;
+        clear arrayOfPosition;          % Clear the array after each frame
     end
 
 end
