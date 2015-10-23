@@ -7,9 +7,8 @@ function Visualization(dataDir,filename)
     videoFileReader = vision.VideoFileReader(video);
     %VARIABLE: tracksList -> matrix extracted from tracks text file
     tracksList = load(tracksFile);
-   
     fid = fopen(dataFile);
-    trackdata = textscan(fid, '%d%s', 'delimiter', ',');
+    trackData = textscan(fid, '%d%s', 'delimiter', ',');
     fclose(fid);
     
     
@@ -24,21 +23,28 @@ function Visualization(dataDir,filename)
     %disp(b);
     
     videoInfo = info(videoFileReader);
-    videoPlayer = vision.VideoPlayer('Position',[300 300 videoInfo.VideoSize+30]);
+    videoPlayer = vision.VideoPlayer('Position',[400 0 videoInfo.VideoSize+30]);
     %VARIABLE: iterator-> a helper variable in counting video frames
     iterator = 1;
-    
+    counter = 1;
     while ~isDone(videoFileReader)
+        
+        
         % Extract next frame
         videoFrame = step(videoFileReader);
  
-        
-            %Find the object in the specific Frame
+            %                STEP 1               %     
+            %Find the object in the specific Frame%
+            %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+            
             %VARIABLE: boundObjects -> determine the existence of object in a
-            %          specifc frame. Output is a matrix. of detected Frames.
+            %                          specifc frame. Output is a matrix. of detected Frames.
             boundObjects = tracksList(tracksList(:,2)==iterator,:);
 
-            % Extract Position of Bounding Box
+            %              STEP 2            %
+            %Extract Position of Bounding Box%
+            %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+            
             %VARIABLE: flag -> return the total number of records inside
             %                  boundObjects.
             %VARIABLE: multipleObjectFlag -> helps to draw multiple
@@ -46,36 +52,48 @@ function Visualization(dataDir,filename)
             %VARIABLE: rowInBoundObjects -> return the rows in boundObjects
             %                               matrix
             flag = size(boundObjects,1);
-            positionOfBox = [0 0 0 0];
+            positionOfBox = [0 0 0 0];  
             
-           
-            if(size(boundObjects)>0)  
+            % Determining Objects  
+            objectType = trackData(:,2);
+            objectID = trackData(:,1);
+ 
+            objectID = cell2mat(objectID);
+            
+            objectType = objectType{1};
+            
+            
+     
+            for rowInBoundObjects = 1:flag  
+                trackID = boundObjects(rowInBoundObjects,1);      
+                x = boundObjects(rowInBoundObjects,3);      
+                y = boundObjects(rowInBoundObjects,4);
+                width = boundObjects(rowInBoundObjects,5);
+                height = boundObjects(rowInBoundObjects,6);
+                positionOfBox = [x y width height];
                 
-                for rowInBoundObjects = 1:flag  
-                    
-                    trackID = boundObjects(rowInBoundObjects,1);      
-                    x = boundObjects(rowInBoundObjects,3);      
-                    y = boundObjects(rowInBoundObjects,4);
-                    width = boundObjects(rowInBoundObjects,5);
-                    height = boundObjects(rowInBoundObjects,6);
-                    positionOfBox = [x y width height];       
-
+                currentObjectID = objectID(counter,1);
+              
+                if(trackID == currentObjectID)
+                    counter = counter + 1;
+                    currentObject = objectType(trackID);
+                   
                 end
                 
+                videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,currentObject);
+               
+                step(videoPlayer,videoOut); 
+               
             end
-            videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');      
-            step(videoPlayer,videoOut);  
-    
+            
+            if(flag==0)
+                videoOut = insertObjectAnnotation(videoFrame,'rectangle',positionOfBox,'object');
+                 step(videoPlayer,videoOut); 
+            end
+                
 
-    % Determine what kind of object it is
-    %         objectType = dataFile(2:end,2);
-    %         objectID = dataFile(2:end,1);
-    %         if(s==objectID)
-    %              objectDisplayed = dataFile(objectID,objectType);
-    %         else
-    %             objectDisplayed = '-';
-    %         end
-    % Draw it Out in video frames
+
+
 
 
 
