@@ -1,4 +1,9 @@
 function Visualization(dataDir,filename)
+    
+    %%% IMPORTANT NOTE:
+    %    For the TackLabels_PHOW.dat File, you need to remove the first
+    %    line "ID,LABELS" in the dat file manually before using it here.
+    %%%
     video = strcat(dataDir, '\', filename, '.avi' );
     dataFile = strcat(dataDir, '\', filename, ' - TackLabels_PHOW.dat');
     tracksFile = strcat(dataDir,'\', filename, ' - tracks.txt');
@@ -34,17 +39,17 @@ function Visualization(dataDir,filename)
         % Extract next frame
         videoFrame = step(videoFileReader);
  
-            %                STEP 1               %     
-            %Find the object in the specific Frame%
-            %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+            %                STEP 1                 %     
+            % Find the object in the specific Frame %
+            % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
             
             %VARIABLE: boundObjects -> determine the existence of object in a
             %                          specifc frame. Output is a matrix. of detected Frames.
             boundObjects = tracksList(tracksList(:,2)==iterator,:);
 
-            %              STEP 2            %
-            %Extract Position of Bounding Box%
-            %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+            %              STEP 2              %
+            % Extract Position of Bounding Box %
+            % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
             
             %VARIABLE: flag -> return the total number of records inside
             %                  boundObjects.
@@ -106,10 +111,10 @@ function Visualization(dataDir,filename)
             end
                 
     % Print frame number
-    %         videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
+    % videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
 
         iterator = iterator + 1;
-        pause(0.05);
+        pause(0.25);
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
