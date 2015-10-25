@@ -31,8 +31,9 @@ function Visualization(dataDir,filename)
     videoPlayer = vision.VideoPlayer('Position',[400 0 videoInfo.VideoSize+30]);
     %VARIABLE: iterator-> a helper variable in counting video frames
     iterator = 1;
-
-    
+    lineArrayTracker = 1;
+    sizeOfArray = 100;      % an upper limit for the array size.
+    arrayOfLine = zeros(sizeOfArray,2); % Declare outside loop because this must retain info for few frames.
     while ~isDone(videoFileReader)
         
         
@@ -61,6 +62,7 @@ function Visualization(dataDir,filename)
             
             positionOfBox = [0 0 0 0];  
             
+            
             % Determining Objects  
             objectType = trackData(:,2);
             objectID = trackData(:,1);
@@ -72,7 +74,7 @@ function Visualization(dataDir,filename)
             flagLabel = size(objectID,1);   % to calculate array's size of objectid
             
             % Multiple Object Bounding
-            sizeOfArray = 100;      % an upper limit for the array size.
+            
             arrayOfPosition = zeros(sizeOfArray,4); %initialize 100 empty arrays
             
      
@@ -89,19 +91,44 @@ function Visualization(dataDir,filename)
                 arrayOfPosition(rowInBoundObjects,:) = positionOfBox(1,:);      % Putting the position into the empty array
                                 
                 % Determining the object Type
-                for currentObjectID = 1:flagLabel
-                    
+                for currentObjectID = 1:flagLabel                    
                     if(trackID == currentObjectID)
-
                         currentObject = objectType(currentObjectID);
-
                     end
                 end
                 
+                % Drawing Tracks Line part
+                      
+                arrayOfLine(lineArrayTracker,1) = x;
+                arrayOfLine(lineArrayTracker,2) = y;
+                if(arrayOfLine(2,1)>0 && arrayOfLine(2,2)>0 )       % Condition to check whether we have >1 record 
+                    for i=1:size(arrayOfLine)
+                        j = 1; % initialize
+                        if(arrayOfLine(i,1)==0 && arrayOfLine(i,2)==0)
+                            break;
+                        end
+                        if(i>1)
+                            j= i-1; %% Indicates the previous row of i
+                        end
+                        
+                        x1 = arrayOfLine(j,1);
+                        y1 = arrayOfLine(j,2);
+                        x2 = arrayOfLine(i,1);
+                        y2 = arrayOfLine(i,2);
+                        
+                    end
+                    tracksLine = insertShape(videoFrame-videoFrame,'Line',[x1 y1 x2 y2]);  % videoFrame-videoFrame, omitting the background of frames  
+                else
+                    tracksLine = insertShape(videoFrame-videoFrame,'Line',[0 0 0 0]);
+                end
+                
+                % End of drawing Tracks Line
+                
+                
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
-               
-                step(videoPlayer,videoOut); 
-               
+                                
+                step(videoPlayer,tracksLine+videoOut); 
+                lineArrayTracker = lineArrayTracker + 1;
             end
             
             % If no frames detected
@@ -112,9 +139,9 @@ function Visualization(dataDir,filename)
                 
     % Print frame number
     % videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
-
+        
         iterator = iterator + 1;
-        pause(0.25);
+        
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
