@@ -40,9 +40,10 @@ function Visualization(dataDir,filename)
     maximumCountID = max(tracksList);     % get the maximum for each column
     maximumCountID = maximumCountID(:,1); % Column is 6, row is the highest no. of ID for cell size.
     
-    counterForDiffObj = 15758;
+    counterForDiffObj = 15758;  % Hardcoded, to be changed later
     arrayOfDiffObj = zeros(maximumCountID,1);
     arrayCount = 1;
+    % The loop below is to help in creating cell rows.
     for i=1:counterForDiffObj
         
         if(i==1)
@@ -74,6 +75,7 @@ function Visualization(dataDir,filename)
         
     end
     matrixForLine = mat2cell(tracksList,arrayOfDiffObj,[6]);
+    
 
     
     while ~isDone(videoFileReader)
@@ -138,23 +140,11 @@ function Visualization(dataDir,filename)
                     end
                 end
                 
-                middlePointX = (width/2) + x;
-                middlePointY = (height/2) + y;
-                
-                % Storing the middlePoints into an array, so that a
-                % progressive line can be plotted.
-                
-                arrayOfLine(lineArrayTracker,1) = middlePointX;
-                arrayOfLine(lineArrayTracker,2) = middlePointY;
-                
-                if(arrayOfLine(lineArrayTracker,1)~=0 && arrayOfLine(lineArrayTracker,2)~=0)
-                    %arrayOfLine(lineArrayTracker,1) = trackID;
-                    lineArrayTracker = lineArrayTracker + 1;
-                end
+
                                 
                 
                 
-                tracksLine = insertShape(videoFrame-videoFrame,'Line',[ ]);
+                tracksLine = insertShape(videoFrame-videoFrame,'Line',[matrixForLine]);
                 
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
