@@ -15,8 +15,7 @@ function Visualization(dataDir,filename)
     fid = fopen(dataFile);
     trackData = textscan(fid, '%d%s', 'delimiter', ',');
     fclose(fid);
-    
-    
+        
     %fid= fopen(tracksFile);
     
     %==========================================================%
@@ -34,6 +33,49 @@ function Visualization(dataDir,filename)
     lineArrayTracker = 1;
     sizeOfArray = 100;      % an upper limit for the array size.
     arrayOfLine = zeros(sizeOfArray,2); % Declare outside loop because this must retain info for few frames.
+
+    
+    %Cell matrix for lines of tracks
+    IDCount = 0;
+    maximumCountID = max(tracksList);     % get the maximum for each column
+    maximumCountID = maximumCountID(:,1); % Column is 6, row is the highest no. of ID for cell size.
+    
+    counterForDiffObj = 15758;
+    arrayOfDiffObj = zeros(maximumCountID,1);
+    arrayCount = 1;
+    for i=1:counterForDiffObj
+        
+        if(i==1)
+            previousPointer = tracksList(1,1);
+            IDCount = IDCount + 1;
+        end
+        if(i>1)
+            currentPointer = tracksList(i,1);
+            if(currentPointer == previousPointer)
+                IDCount = IDCount + 1;                
+            else
+                if(IDCount == 0)
+                   IDCount = IDCount + 1; 
+                
+                elseif(arrayCount ~= 1)
+                    IDCount = IDCount + 1;      % Correction to line 48 Counting-Cow's problem
+                end
+                arrayOfDiffObj(arrayCount,1) = IDCount;
+                arrayCount = arrayCount + 1;
+                IDCount = 0;
+            end
+          
+            previousPointer = currentPointer;
+        end
+        if(counterForDiffObj == i)
+            IDCount = IDCount + 1;
+            arrayOfDiffObj(arrayCount,1) = IDCount;
+        end
+        
+    end
+    matrixForLine = mat2cell(tracksList,arrayOfDiffObj,[6]);
+
+    
     while ~isDone(videoFileReader)
         
         
@@ -77,7 +119,6 @@ function Visualization(dataDir,filename)
             
             arrayOfPosition = zeros(sizeOfArray,4); %initialize 100 empty arrays
             
-     
             for rowInBoundObjects = 1:flag  
                 
                 trackID = boundObjects(rowInBoundObjects,1);      
@@ -85,7 +126,7 @@ function Visualization(dataDir,filename)
                 y = boundObjects(rowInBoundObjects,4);
                 width = boundObjects(rowInBoundObjects,5);
                 height = boundObjects(rowInBoundObjects,6);
-                 
+                
                 positionOfBox = [x y width height];
                 
                 arrayOfPosition(rowInBoundObjects,:) = positionOfBox(1,:);      % Putting the position into the empty array
@@ -97,38 +138,28 @@ function Visualization(dataDir,filename)
                     end
                 end
                 
-                % Drawing Tracks Line part
-                      
-                arrayOfLine(lineArrayTracker,1) = x;
-                arrayOfLine(lineArrayTracker,2) = y;
-                if(arrayOfLine(2,1)>0 && arrayOfLine(2,2)>0 )       % Condition to check whether we have >1 record 
-                    for i=1:size(arrayOfLine)
-                        j = 1; % initialize
-                        if(arrayOfLine(i,1)==0 && arrayOfLine(i,2)==0)
-                            break;
-                        end
-                        if(i>1)
-                            j= i-1; %% Indicates the previous row of i
-                        end
-                        
-                        x1 = arrayOfLine(j,1);
-                        y1 = arrayOfLine(j,2);
-                        x2 = arrayOfLine(i,1);
-                        y2 = arrayOfLine(i,2);
-                        
-                    end
-                    tracksLine = insertShape(videoFrame-videoFrame,'Line',[x1 y1 x2 y2]);  % videoFrame-videoFrame, omitting the background of frames  
-                else
-                    tracksLine = insertShape(videoFrame-videoFrame,'Line',[0 0 0 0]);
+                middlePointX = (width/2) + x;
+                middlePointY = (height/2) + y;
+                
+                % Storing the middlePoints into an array, so that a
+                % progressive line can be plotted.
+                
+                arrayOfLine(lineArrayTracker,1) = middlePointX;
+                arrayOfLine(lineArrayTracker,2) = middlePointY;
+                
+                if(arrayOfLine(lineArrayTracker,1)~=0 && arrayOfLine(lineArrayTracker,2)~=0)
+                    %arrayOfLine(lineArrayTracker,1) = trackID;
+                    lineArrayTracker = lineArrayTracker + 1;
                 end
+                                
                 
-                % End of drawing Tracks Line
                 
+                tracksLine = insertShape(videoFrame-videoFrame,'Line',[ ]);
                 
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
                 step(videoPlayer,tracksLine+videoOut); 
-                lineArrayTracker = lineArrayTracker + 1;
+                
             end
             
             % If no frames detected
@@ -141,7 +172,7 @@ function Visualization(dataDir,filename)
     % videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
         
         iterator = iterator + 1;
-        
+        pause(0.5);
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
