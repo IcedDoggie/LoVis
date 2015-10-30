@@ -78,6 +78,13 @@ function Visualization(dataDir,filename)
     
     matrixForLine = mat2cell(tracksList(:,[3 4 5 6]),arrayOfDiffObj,[4]);
     
+    singleRowMatrixCell = cell(1000,1);
+    %initialize singleRowMatrixCell
+    for a=1:1000
+        tempRow = [0 0 0 0];
+        tempRow = mat2cell(tempRow,1,4);
+        singleRowMatrixCell(a,:) = tempRow;
+    end
     
     while ~isDone(videoFileReader)
         
@@ -142,30 +149,40 @@ function Visualization(dataDir,filename)
                 end
                 
                 % Operation to find draw line of tracks
-                matrixForLineDouble = matrixForLine{trackID,:};     % to select the row to be processed.
+                matrixForLineDouble = matrixForLine{boundObjects(rowInBoundObjects,1),:};     % to select the row to be processed.
                 matrixForLineDoubleXY = matrixForLineDouble(:,[1 2]);   % to select x and y pos only
                 A = (size(matrixForLineDoubleXY));
-                A = A(1,1);
+                A = A(1,1);                    
                 singleRowMatrix = zeros(A*2);
+
                 singleRowMatrix = singleRowMatrix(1,:);
-                counterForYPos = 0;
-                counterForRow = 1;
-                for i=1:A*2
-                    if(mod(i,2)==0)
-                        singleRowMatrix(1,i) = matrixForLineDoubleXY(counterForYPos,2);
-                         counterForRow = counterForRow + 1;
-                    else
-                        singleRowMatrix(1,i) = matrixForLineDoubleXY(counterForRow,1);
-                        counterForYPos = counterForYPos + 1; 
+                for w=1:flag
+
+                    % Putting the matrix into one single row
+                    counterForYPos = 0;
+                    counterForRow = 1;
+                    for i=1:A*2
+                        if(mod(i,2)==0)
+                            singleRowMatrix(1,i) = matrixForLineDoubleXY(counterForYPos,2);
+                            counterForRow = counterForRow + 1;
+                        else
+                            singleRowMatrix(1,i) = matrixForLineDoubleXY(counterForRow,1);
+                            counterForYPos = counterForYPos + 1; 
+                        end
+                    end
+
+                    if(A==1)
+                        singleRowMatrix = [0 0 0 0];
                     end
                 end
-                if(A==1)
-                    singleRowMatrix = [0 0 0 0];
+                if(A>1)
+                    singleRowMatrixConverted = mat2cell(singleRowMatrix,1,A*2);
+                    singleRowMatrixCell(trackID,:) = singleRowMatrixConverted;
                 end
-                % ends
+                % end of operation
                 
                 
-                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrix,'color','yellow');
+                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color','yellow');
                 
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
