@@ -150,6 +150,12 @@ function Visualization(dataDir,filename)
                 
                 % Operation to find draw line of tracks
                 matrixForLineDouble = matrixForLine{boundObjects(rowInBoundObjects,1),:};     % to select the row to be processed.
+                % Determine the middle point
+                middlePointX = matrixForLineDouble(:,1) + matrixForLineDouble(:,3)/2;
+                middlePointY = matrixForLineDouble(:,2) + matrixForLineDouble(:,4)/2;
+                matrixForLineDouble(:,1) = middlePointX;
+                matrixForLineDouble(:,2) = middlePointY;
+                % Middle point part ends
                 matrixForLineDoubleXY = matrixForLineDouble(:,[1 2]);   % to select x and y pos only
                 A = (size(matrixForLineDoubleXY));
                 A = A(1,1);                    
@@ -200,7 +206,7 @@ function Visualization(dataDir,filename)
     % videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
         
         iterator = iterator + 1;
-        %pause(0.5);
+        pause(0.25);
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
