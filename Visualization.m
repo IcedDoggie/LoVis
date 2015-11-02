@@ -141,12 +141,37 @@ function Visualization(dataDir,filename)
                 
                 arrayOfPosition(rowInBoundObjects,:) = positionOfBox(1,:);      % Putting the position into the empty array
                                 
-                % Determining the object Type
+                % Determining the object Type( For Bounding Box Titie)
                 for currentObjectID = 1:flagLabel                    
                     if(trackID == currentObjectID)
                         currentObject = objectType(currentObjectID);
+                        currentObjectSwitch = char(currentObject);
+                        % Determine the object Type( For Colors of Line)
+                        switch currentObjectSwitch
+                            case 'Car'
+                                lineColor = 'blue';
+                                break;
+                            case 'Humans' 
+                                lineColor = 'yellow';
+                                break;
+                            case 'GOP' 
+                                lineColor = 'red';
+                                break;
+                            case 'Bicycle'
+                                lineColor = 'green';
+                                break;
+                            case 'Clutter'
+                                lineColor = 'black';
+                                break;
+                            otherwise
+                                lineColor = 'white';
+                                break;
+                        end
                     end
                 end
+                
+               
+              
                 
                 % Operation to find draw line of tracks
                 matrixForLineDouble = matrixForLine{boundObjects(rowInBoundObjects,1),:};     % to select the row to be processed.
@@ -187,8 +212,10 @@ function Visualization(dataDir,filename)
                 end
                 % end of operation
                 
+                % Continuing from lines, if the tracks no more in video, erase from singleRowMatrixCell
+            
                 
-                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color','yellow');
+                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',lineColor);
                 
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
@@ -203,10 +230,10 @@ function Visualization(dataDir,filename)
             end
                 
     % Print frame number
-    % videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
+%     videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
         
         iterator = iterator + 1;
-        pause(0.25);
+        pause(0.5);
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
