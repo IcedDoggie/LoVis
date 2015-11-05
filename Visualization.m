@@ -59,7 +59,7 @@ function Visualization(dataDir,filename)
                    IDCount = IDCount + 1; 
                 
                 elseif(arrayCount ~= 1)
-                    IDCount = IDCount + 1;      % Correction to line 48 Counting-Cow's problem
+                    IDCount = IDCount + 1;      % Correction to line 50 Counting-Cow's problem
                 end
                 arrayOfDiffObj(arrayCount,1) = IDCount;
                 arrayCount = arrayCount + 1;
@@ -77,14 +77,24 @@ function Visualization(dataDir,filename)
     
     
     matrixForLine = mat2cell(tracksList(:,[3 4 5 6]),arrayOfDiffObj,[4]);
-    
-    singleRowMatrixCell = cell(1000,1);
+    % initialize Color cell array
+%     matrixCellColor = cell(maximumCountID,1);
+    for a=1 : maximumCountID
+        initialColor = {'white'};
+        matrixCellColor(a,1) = initialColor;
+        
+    end
+
     %initialize singleRowMatrixCell
-    for a=1:1000
+    singleRowMatrixCell = cell(maximumCountID,1);
+    for a=1:maximumCountID
         tempRow = [0 0 0 0];
         tempRow = mat2cell(tempRow,1,4);
         singleRowMatrixCell(a,:) = tempRow;
     end
+    
+    
+    
     
     while ~isDone(videoFileReader)
         
@@ -145,33 +155,8 @@ function Visualization(dataDir,filename)
                 for currentObjectID = 1:flagLabel                    
                     if(trackID == currentObjectID)
                         currentObject = objectType(currentObjectID);
-                        currentObjectSwitch = char(currentObject);
-                        % Determine the object Type( For Colors of Line)
-                        switch currentObjectSwitch
-                            case 'Car'
-                                lineColor = 'blue';
-                                break;
-                            case 'Humans' 
-                                lineColor = 'yellow';
-                                break;
-                            case 'GOP' 
-                                lineColor = 'red';
-                                break;
-                            case 'Bicycle'
-                                lineColor = 'green';
-                                break;
-                            case 'Clutter'
-                                lineColor = 'black';
-                                break;
-                            otherwise
-                                lineColor = 'white';
-                                break;
-                        end
                     end
                 end
-                
-               
-              
                 
                 % Operation to find draw line of tracks
                 matrixForLineDouble = matrixForLine{boundObjects(rowInBoundObjects,1),:};     % to select the row to be processed.
@@ -212,11 +197,34 @@ function Visualization(dataDir,filename)
                 end
                 % end of operation
                 
-                % Continuing from lines, if the tracks no more in video, erase from singleRowMatrixCell
-            
+                % Determining Color for each object
+%                 currentObjectHelper = char(currentObject);
+%                    lineColor = {'white'};
+%                    switch currentObjectHelper
+%                         case 'Cars'
+%                             lineColor = {'blue'};
+%                             break;
+%                         case 'Humans'
+%                             lineColor = {'yellow'};
+%                             break;
+%                         case 'GOP'
+%                             lineColor = {'red'};
+%                             break;
+%                         case 'Bicycle'
+%                             lineColor = {'green'};
+%                             break;
+%                         case 'Clutter'
+%                             lineColor = {'black'};
+%                             break;
+%                             
+%                          
+%                     end
+              
+                % object Color ends
                 
-                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',lineColor);
                 
+                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
+
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
                 step(videoPlayer,tracksLine+videoOut); 
@@ -230,7 +238,7 @@ function Visualization(dataDir,filename)
             end
                 
     % Print frame number
-%     videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
+    % videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
         
         iterator = iterator + 1;
         pause(0.5);
