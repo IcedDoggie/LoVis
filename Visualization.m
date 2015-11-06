@@ -224,17 +224,18 @@ function Visualization(dataDir,filename)
                 % object Color ends
                 
                 
-%                 tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
+               tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
 
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
-%                 step(videoPlayer,tracksLine+videoOut); 
+
                 
 
             end
             
             % If no frames detected
             if(flag==0)
+                tracksLine = insertShape(videoFrame-videoFrame,'line',[0 0 0 0],'color','yellow');
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,'object');
                 step(videoPlayer,videoOut); 
                 iterator = iterator + 1;
@@ -242,10 +243,10 @@ function Visualization(dataDir,filename)
                 
 %     Print frame number
 %     videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
-        step(videoPlayer,videoOut); 
+        step(videoPlayer,videoOut+tracksLine); 
         iterator = iterator + 1;
         
-         pause(0.25);
+         pause(0.5);
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
