@@ -29,7 +29,7 @@ function Visualization(dataDir,filename)
     videoInfo = info(videoFileReader);
     videoPlayer = vision.VideoPlayer('Position',[400 0 videoInfo.VideoSize+30]);
     %VARIABLE: iterator-> a helper variable in counting video frames
-    iterator = 1;
+    iterator = 0;
     lineArrayTracker = 1;
     sizeOfArray = 100;      % an upper limit for the array size.
     arrayOfLine = zeros(sizeOfArray,2); % Declare outside loop because this must retain info for few frames.
@@ -141,7 +141,8 @@ function Visualization(dataDir,filename)
             
             for rowInBoundObjects = 1:flag  
                 
-                trackID = boundObjects(rowInBoundObjects,1);      
+                trackID = boundObjects(rowInBoundObjects,1);   
+                trackInFrame = boundObjects(rowInBoundObjects,2); % is here to do checking for concurrency.
                 x = boundObjects(rowInBoundObjects,3);      
                 y = boundObjects(rowInBoundObjects,4);
                 width = boundObjects(rowInBoundObjects,5);
@@ -223,25 +224,28 @@ function Visualization(dataDir,filename)
                 % object Color ends
                 
                 
-                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
+%                 tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
 
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
-                step(videoPlayer,tracksLine+videoOut); 
+%                 step(videoPlayer,tracksLine+videoOut); 
                 
+
             end
             
             % If no frames detected
             if(flag==0)
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,'object');
                 step(videoPlayer,videoOut); 
+                iterator = iterator + 1;
             end
                 
-    % Print frame number
-    % videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
-        
+%     Print frame number
+%     videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
+        step(videoPlayer,videoOut); 
         iterator = iterator + 1;
-        pause(0.5);
+        
+         pause(0.25);
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
