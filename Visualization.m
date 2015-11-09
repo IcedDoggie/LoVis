@@ -198,44 +198,34 @@ function Visualization(dataDir,filename)
                 end
                 % end of operation
                 
-                % Determining Color for each object
+                % Determining Color for each object              
 %                 currentObjectHelper = char(currentObject);
 %                    lineColor = {'white'};
-%                    switch currentObjectHelper
-%                         case 'Cars'
-%                             lineColor = {'blue'};
-%                             break;
-%                         case 'Humans'
-%                             lineColor = {'yellow'};
-%                             break;
-%                         case 'GOP'
-%                             lineColor = {'red'};
-%                             break;
-%                         case 'Bicycle'
-%                             lineColor = {'green'};
-%                             break;
-%                         case 'Clutter'
-%                             lineColor = {'black'};
-%                             break;
-%                             
-%                          
-%                     end
-              
+%                    if(currentObjectHelper == 'Cars')
+%                        lineColor = {'blue'};
+%                    elseif(currentObjectHelper == 'Humans') 
+%                        lineColor = {'yellow'};
+%                    else
+%                        lineColor = {'red'};
+%                    end
+%                    matrixCellColor(trackID,1) = lineColor; 
                 % object Color ends
                 
                 
-               tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
+%                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
 
-                videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
+               videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
                                 
-
-                
-
+                if(rowInBoundObjects==flag)     % This Line is to avoid iterator moving ahead of videoframes when multiple objects bounded.
+                    step(videoPlayer,videoOut); 
+                    iterator = iterator + 1;
+                end
+            
             end
             
             % If no frames detected
             if(flag==0)
-                tracksLine = insertShape(videoFrame-videoFrame,'line',[0 0 0 0],'color','yellow');
+%                 tracksLine = insertShape(videoFrame-videoFrame,'line',[0 0 0 0],'color','yellow');
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,'object');
                 step(videoPlayer,videoOut); 
                 iterator = iterator + 1;
@@ -243,10 +233,9 @@ function Visualization(dataDir,filename)
                 
 %     Print frame number
 %     videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
-        step(videoPlayer,videoOut+tracksLine); 
-        iterator = iterator + 1;
+
         
-         pause(0.5);
+       pause(0.15);
         clear arrayOfPosition;          % Clear the array after each frame
     end
 
