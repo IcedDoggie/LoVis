@@ -31,14 +31,14 @@ function Visualization(dataDir,filename)
     %VARIABLE: iterator-> a helper variable in counting video frames
     iterator = 0;
     lineArrayTracker = 1;
-    sizeOfArray = 100;      % an upper limit for the array size.
-    arrayOfLine = zeros(sizeOfArray,2); % Declare outside loop because this must retain info for few frames.
-
-    
+ 
     %Cell matrix for lines of tracks
     IDCount = 0;
     maximumCountID = max(tracksList);     % get the maximum for each column
     maximumCountID = maximumCountID(:,1); % Column is 6, row is the highest no. of ID for cell size.
+    
+    sizeOfArray = maximumCountID;      % an upper limit for the array size.
+    arrayOfLine = zeros(sizeOfArray,2); % Declare outside loop because this must retain info for few frames.
     
     counterForDiffObj = 15758;  % Hardcoded, to be changed later
     arrayOfDiffObj = zeros(maximumCountID,1);
@@ -78,14 +78,14 @@ function Visualization(dataDir,filename)
     
     matrixForLine = mat2cell(tracksList(:,[3 4 5 6]),arrayOfDiffObj,[4]);
     % initialize Color cell array
-%     matrixCellColor = cell(maximumCountID,1);
+    matrixCellColor = cell(maximumCountID,1);
     for a=1 : maximumCountID
         initialColor = {'white'};
         matrixCellColor(a,1) = initialColor;
         
     end
 
-    %initialize singleRowMatrixCell
+    % initialize singleRowMatrixCell
     singleRowMatrixCell = cell(maximumCountID,1);
     for a=1:maximumCountID
         tempRow = [0 0 0 0];
@@ -93,7 +93,13 @@ function Visualization(dataDir,filename)
         singleRowMatrixCell(a,:) = tempRow;
     end
     
-    
+    % initialize currentObject
+    currentObjectCell = cell(maximumCountID,1);
+    for a=1:maximumCountID
+        initialCurrentObject = {'Cars'};
+        currentObjectCell(a,1) = initialCurrentObject;
+        currentObjectCellConcurrent = currentObjectCell;
+    end
     
     
     while ~isDone(videoFileReader)
@@ -155,7 +161,8 @@ function Visualization(dataDir,filename)
                 % Determining the object Type( For Bounding Box Titie)
                 for currentObjectID = 1:flagLabel                    
                     if(trackID == currentObjectID)
-                        currentObject = objectType(currentObjectID);
+                        currentObjectCell(trackID,1)= objectType(currentObjectID);     % used in line color operation
+                        currentObjectCellConcurrent(rowInBoundObjects,1) =  objectType(currentObjectID);  % to be inserted into insertObjectAnnotation
                     end
                 end
                 
@@ -199,25 +206,29 @@ function Visualization(dataDir,filename)
                 % end of operation
                 
                 % Determining Color for each object              
-%                 currentObjectHelper = char(currentObject);
-%                    lineColor = {'white'};
-%                    if(currentObjectHelper == 'Cars')
-%                        lineColor = {'blue'};
-%                    elseif(currentObjectHelper == 'Humans') 
-%                        lineColor = {'yellow'};
-%                    else
-%                        lineColor = {'red'};
-%                    end
-%                    matrixCellColor(trackID,1) = lineColor; 
+                currentObjectHelper = char(currentObjectCell{trackID,1});
+                   lineColor = {'white'};
+                   if(strcmp(currentObjectHelper,'Cars'))
+                       lineColor = {'blue'};
+                   elseif(strcmp(currentObjectHelper,'Humans')) 
+                       lineColor = {'yellow'};
+                   elseif(strcmp(currentObjectHelper,'GOP')) 
+                       lineColor = {'red'};
+                   elseif(strcmp(currentObjectHelper,'Bicycle')) 
+                       lineColor = {'green'};                   
+                   else
+                       lineColor = {'black'};
+                   end
+                   matrixCellColor(trackID,1) = lineColor; 
                 % object Color ends
                 
                 
-%                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
+                tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
 
-               videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObject);
+                videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,currentObjectCellConcurrent);
                                 
                 if(rowInBoundObjects==flag)     % This Line is to avoid iterator moving ahead of videoframes when multiple objects bounded.
-                    step(videoPlayer,videoOut); 
+                    step(videoPlayer,videoOut+tracksLine); 
                     iterator = iterator + 1;
                 end
             
@@ -235,8 +246,8 @@ function Visualization(dataDir,filename)
 %     videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
 
         
-       pause(0.15);
-        clear arrayOfPosition;          % Clear the array after each frame
+       %pause(0.05);
+       clear arrayOfPosition;          % Clear the array after each frame
     end
 
 end
