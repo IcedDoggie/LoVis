@@ -43,6 +43,10 @@ function Visualization(dataDir,filename)
     counterForDiffObj = 15758;  % Hardcoded, to be changed later
     arrayOfDiffObj = zeros(maximumCountID,1);
     arrayCount = 1;
+
+
+
+    
     % The loop below is to help in creating cell rows.
     for i=1:counterForDiffObj
         
@@ -76,6 +80,7 @@ function Visualization(dataDir,filename)
     end
     
     
+
     matrixForLine = mat2cell(tracksList(:,[3 4 5 6]),arrayOfDiffObj,[4]);
     % initialize Color cell array
     matrixCellColor = cell(maximumCountID,1);
@@ -88,7 +93,7 @@ function Visualization(dataDir,filename)
     % initialize singleRowMatrixCell
     singleRowMatrixCell = cell(maximumCountID,1);
     for a=1:maximumCountID
-        tempRow = [0 0 0 0];
+        tempRow = [0 0 0 0];        
         tempRow = mat2cell(tempRow,1,4);
         singleRowMatrixCell(a,:) = tempRow;
     end
@@ -100,6 +105,9 @@ function Visualization(dataDir,filename)
         currentObjectCell(a,1) = initialCurrentObject;
         currentObjectCellConcurrent = currentObjectCell;
     end
+    
+    % initialize deleteLineArray
+    deleteLineArray =  arrayOfDiffObj;
     
     
     while ~isDone(videoFileReader)
@@ -222,6 +230,14 @@ function Visualization(dataDir,filename)
                    matrixCellColor(trackID,1) = lineColor; 
                 % object Color ends
                 
+                % Operation to determine whether the line still will be
+                % used or not
+                deleteLineArray(trackID,1) = deleteLineArray(trackID,1) - 1;               
+                if(deleteLineArray(trackID,1)==0)
+                    singleRowMatrixCell(trackID,1) = tempRow;                              
+                end
+                
+                % Operation ends
                 
                 tracksLine = insertShape(videoFrame-videoFrame,'line',singleRowMatrixCell,'color',matrixCellColor);
 
@@ -236,7 +252,7 @@ function Visualization(dataDir,filename)
             
             % If no frames detected
             if(flag==0)
-%                 tracksLine = insertShape(videoFrame-videoFrame,'line',[0 0 0 0],'color','yellow');
+%               tracksLine = insertShape(videoFrame-videoFrame,'line',[0 0 0 0],'color','yellow');
                 videoOut = insertObjectAnnotation(videoFrame,'rectangle',arrayOfPosition,'object');
                 step(videoPlayer,videoOut); 
                 iterator = iterator + 1;
@@ -246,7 +262,7 @@ function Visualization(dataDir,filename)
 %     videoOut = insertText(videoOut,[3 3],iterator,'AnchorPoint','LeftTop');
 
         
-       %pause(0.05);
+       pause(0.15);
        clear arrayOfPosition;          % Clear the array after each frame
     end
 
