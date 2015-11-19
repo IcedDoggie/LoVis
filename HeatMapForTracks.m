@@ -21,10 +21,9 @@ function HeatMapForTracks(dataDir,filename)
     vidColumn = vidColumn(:,1);
         
     % Initializing matrix for heatmapObj
-    heatmapMatrix = zeros(vidWidth,vidHeight);
+    heatmapMatrix = zeros(vidHeight,vidWidth);
     
     dummyData = heatmapMatrix;
-
 
     % Get the max rows and columns from data
     maxRow = posMatrix(:,1);
@@ -36,9 +35,7 @@ function HeatMapForTracks(dataDir,filename)
     for i=1 : maxCount
         singleRowPosX = posMatrix(i,1);
         singleRowPosY = posMatrix(i,2);   
-        heatmapMatrix(singleRowPosX,singleRowPosY) = heatmapMatrix(singleRowPosX,singleRowPosY) + 4;
-        
-        
+        heatmapMatrix(singleRowPosY,singleRowPosX) = heatmapMatrix(singleRowPosY,singleRowPosX) + 1;     
     end
     
 %     for i=1 : 640
@@ -49,12 +46,12 @@ function HeatMapForTracks(dataDir,filename)
     %heatmapObj2 = HeatMap(posMatrix,'ColorMap',redbluecmap);
     %heatmapObj3 = HeatMap(heatmapMatrix);
     
-%     colormap('jet');
-%       imageHeatData = imagesc(heatmapMatrix);
-%       colorbar;
-%       
-      imagesc(dummyData);
+    colormap('jet');
+      imageHeatData = imagesc(heatmapMatrix);
       colorbar;
+      
+%       imagesc(dummyData);
+%       colorbar;
       
       
      % imageOutputCombined = imfuse(imageHeatData,imageWorld);
