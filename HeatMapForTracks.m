@@ -5,7 +5,6 @@ function HeatMapForTracks(dataDir,filename)
     posMatrix = tracksList(:,3:4);
     maxCount = numel(posMatrix(:,1));
     
-    imageWorld = 'ExpPicture.png';
     
     % Getting the video Frame Size, row and columns 
     videoFile = strcat(dataDir, '\', filename, '.avi');
@@ -22,8 +21,6 @@ function HeatMapForTracks(dataDir,filename)
         
     % Initializing matrix for heatmapObj
     heatmapMatrix = zeros(vidHeight,vidWidth);
-    
-    dummyData = heatmapMatrix;
 
     % Get the max rows and columns from data
     maxRow = posMatrix(:,1);
@@ -38,24 +35,17 @@ function HeatMapForTracks(dataDir,filename)
         heatmapMatrix(singleRowPosY,singleRowPosX) = heatmapMatrix(singleRowPosY,singleRowPosX) + 1;     
     end
     
-%     for i=1 : 640
-%         dummyData(200,i) = 1 + i;
-%     end
 
     %heatmapObj = HeatMap(heatmapMatrix,'ColorMap',redbluecmap,'RowLabels',vidRow,'ColumnLabels',vidColumn);
     %heatmapObj2 = HeatMap(posMatrix,'ColorMap',redbluecmap);
     %heatmapObj3 = HeatMap(heatmapMatrix);
     
     colormap('jet');
-      imageHeatData = imagesc(heatmapMatrix);
-      colorbar;
-      
-%       imagesc(dummyData);
-%       colorbar;
-      
-      
-     % imageOutputCombined = imfuse(imageHeatData,imageWorld);
-    
-    
-
+    imageHeatData = imagesc(heatmapMatrix); %figure    
+    colorbar;
+    %print('figure 1','-dpng'); to print out the heatmap to imfuse, one time use is enough
+    imageHeatmap = imread('expA.png');   
+    imageFromVideo = imread('ExpPicture.png');
+    imageOutputCombined = imfuse(imageHeatmap,imageFromVideo,'blend','Scaling','joint');
+    imshow(imageOutputCombined);    
 end
