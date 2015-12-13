@@ -29,10 +29,50 @@ function HeatMapForTracks(dataDir,filename)
     
     % Parse in the values from dataset to heatmapMatrix
     for i=1 : maxCount
-        singleRowPosX = posMatrix(i,1);
-        singleRowPosY = posMatrix(i,2);   
-        heatmapMatrix(singleRowPosY,singleRowPosX) = heatmapMatrix(singleRowPosY,singleRowPosX) + 1;
-        if()
+        posX = posMatrix(i,1);
+        posY = posMatrix(i,2);   
+        heatmapMatrix(posY,posX) = heatmapMatrix(posY,posX) + 1;
+        if(posY~=1 && posY~=480 && posX~=1 && posX~=640)
+            % Upper left corner pixel
+            x1 = posX - 1;
+            y1 = posY - 1;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
+            
+            % Upper middle pixel
+            x1 = posX + 0;
+            y1 = posY - 1;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.75;
+            
+            % Upper right corner pixel
+            x1 = posX + 1;
+            y1 = posY - 1;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
+            
+            % Left Pixel
+            x1 = posX - 1;
+            y1 = posY + 0;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.75;
+            
+            % Right Pixel
+            x1 = posX + 1;
+            y1 = posY + 0;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.75;
+            
+            % Lower Left Corner Pixel
+            x1 = posX - 1;
+            y1 = posY + 1;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
+            
+            % Lower middle pixel
+            x1 = posX + 0;
+            y1 = posY + 1;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.75;
+            
+            % Lower right corner pixel
+            x1 = posX + 1;
+            y1 = posY + 1;
+            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;            
+            
         end
     end
     
