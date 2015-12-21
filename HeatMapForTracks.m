@@ -33,20 +33,20 @@ function HeatMapForTracks(dataDir,filename)
         posY = posMatrix(i,2);   
         heatmapMatrix(posY,posX) = heatmapMatrix(posY,posX) + 1;
         if(posY~=1 && posY~=480 && posX~=1 && posX~=640)
-            % Upper left corner pixel
-            x1 = posX - 1;
-            y1 = posY - 1;
-            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
+%             % Upper left corner pixel
+%             x1 = posX - 1;
+%             y1 = posY - 1;
+%             heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
             
             % Upper middle pixel
             x1 = posX + 0;
             y1 = posY - 1;
             heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.75;
-            
-            % Upper right corner pixel
-            x1 = posX + 1;
-            y1 = posY - 1;
-            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
+%             
+%             % Upper right corner pixel
+%             x1 = posX + 1;
+%             y1 = posY - 1;
+%             heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
             
             % Left Pixel
             x1 = posX - 1;
@@ -57,33 +57,43 @@ function HeatMapForTracks(dataDir,filename)
             x1 = posX + 1;
             y1 = posY + 0;
             heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.75;
-            
-            % Lower Left Corner Pixel
-            x1 = posX - 1;
-            y1 = posY + 1;
-            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
-            
+%             
+%             % Lower Left Corner Pixel
+%             x1 = posX - 1;
+%             y1 = posY + 1;
+%             heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;
+%             
             % Lower middle pixel
             x1 = posX + 0;
             y1 = posY + 1;
             heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.75;
-            
-            % Lower right corner pixel
-            x1 = posX + 1;
-            y1 = posY + 1;
-            heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;            
+%             
+%             % Lower right corner pixel
+%             x1 = posX + 1;
+%             y1 = posY + 1;
+%             heatmapMatrix(y1,x1) = heatmapMatrix(y1,x1) + 0.5;            
             
         end
     end
     
-
-    %heatmapObj = HeatMap(heatmapMatrix,'ColorMap',redbluecmap,'RowLabels',vidRow,'ColumnLabels',vidColumn);
-    %heatmapObj2 = HeatMap(posMatrix,'ColorMap',redbluecmap);
-    %heatmapObj3 = HeatMap(heatmapMatrix);
+    
+    % Displaying ColorMap
+    computedMatrix = log10(1+heatmapMatrix+eps);
     dataColourMap = jet;
     dataColourMap(1,:) = [1 1 1];
     colormap(dataColourMap);
-    imageHeatData = imagesc(heatmapMatrix); %figure    
+    imageHeatData = imagesc(computedMatrix); %figure    
     colorbar;
-        
+   
+
+    % Read and convert background picture
+%     image = imread('background.png');
+%     image = rgb2gray(image);
+%     imshow(image);
+%     hold on;
+%         
+%     % Image Overlay
+%     imageFuse = imread('withoutNeighbours.png')
+%     imshow(imageFuse);
+
 end
