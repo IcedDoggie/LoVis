@@ -8,6 +8,8 @@ function Visualization(dataDir,filename)
     dataFile = strcat(dataDir, '\', filename, ' - TackLabels_PHOW.dat');
     tracksFile = strcat(dataDir,'\', filename, ' - tracks.txt');
     
+
+    
     
     videoFileReader = vision.VideoFileReader(video);
     %VARIABLE: tracksList -> matrix extracted from tracks text file
@@ -40,7 +42,10 @@ function Visualization(dataDir,filename)
     sizeOfArray = maximumCountID;      % an upper limit for the array size.
     arrayOfLine = zeros(sizeOfArray,2); % Declare outside loop because this must retain info for few frames.
     
-    counterForDiffObj = 15758;  % Hardcoded, to be changed later
+    
+    counterForDiffObj = size(tracksList);   % Getting the total number of lines in the textfile
+    counterForDiffObj = counterForDiffObj(1,1);
+    
     arrayOfDiffObj = zeros(maximumCountID,1);
     arrayCount = 1;
 
