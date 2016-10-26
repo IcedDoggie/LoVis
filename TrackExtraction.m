@@ -32,6 +32,12 @@ function TrackExtraction(filename, dataDir)
     trackInfo = []; % Matti
     count = 1; % Matti
     frameNo = 0; % Matti
+    
+    %image mask, to remove the time on top
+    imageMask = imread('mask.png');
+    imageMask = cat(3, imageMask, imageMask, imageMask);
+    imageMask = im2single(imageMask);
+    
  %*************************************************************************
  %                      Object Detection and Tracking					
  %*************************************************************************
@@ -40,6 +46,7 @@ function TrackExtraction(filename, dataDir)
     %for i=1:1000 %to read only 1000 frames of the video
         %Read the next video frame from the video file.
         frame = obj.reader.step();
+        frame = frame + imageMask;
         frameNo = frameNo + 1; % Matti
         [centroids, bboxes, mask] = detectObjects(frame);
         disp(['Frame #',num2str(frameNo),' ',mat2str(centroids,4)])
@@ -64,15 +71,15 @@ function TrackExtraction(filename, dataDir)
  %                                  Functions					
  %*************************************************************************
     function [centroids, bboxes, mask] = detectObjects(frame)
-
+        
         % Detect foreground.
         mask = obj.detector.step(frame);
-
+        
         % Apply morphological operations to remove noise and fill in holes.
         mask = imopen(mask, strel('rectangle', [3,3]));
         mask = imclose(mask, strel('rectangle', [15, 15]));
         mask = imfill(mask, 'holes');
-
+       
         % Perform blob analysis to find connected components.
         [~, centroids, bboxes] = obj.blobAnalyser.step(mask);
     end
@@ -83,14 +90,14 @@ function TrackExtraction(filename, dataDir)
                 
             % Predict the current location of the track.
             predictedCentroid = predict(tracks(i).kalmanFilter);
-
+            
             % Shift the bounding box so that its center is at
             % the predicted location.
             predictedCentroid = int32(predictedCentroid) - bbox(3:4) / 2;
             tracks(i).bbox = [predictedCentroid, bbox(3:4)];
-            
+             
             tracks(i).frameNo = frameNo;  % Matti
-        end
+        end 
     end
 
     function [assignments, unassignedTracks, unassignedDetections] = ...
@@ -104,7 +111,7 @@ function TrackExtraction(filename, dataDir)
         for i = 1:nTracks
             cost(i, :) = distance(tracks(i).kalmanFilter, centroids);
         end
-
+        
         % Solve the assignment problem.
         costOfNonAssignment = 20;
         [assignments, unassignedTracks, unassignedDetections] = ...
@@ -172,14 +179,13 @@ function TrackExtraction(filename, dataDir)
         bboxes = bboxes(unassignedDetections, :);
 
         for i = 1:size(centroids, 1)
-
             centroid = centroids(i,:);
             bbox = bboxes(i, :);
-
+            
             % Create a Kalman filter object.
             kalmanFilter = configureKalmanFilter('ConstantVelocity', ...
                 centroid, [200, 50], [100, 25], 100);
-
+            
             % Create a new track.
             newTrack = struct(...
                 'id', nextId, ...
